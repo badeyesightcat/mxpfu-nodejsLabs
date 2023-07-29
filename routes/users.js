@@ -32,7 +32,7 @@ router.get("/",(req,res)=>{
 router.get("/:email",(req,res)=>{
   const email = req.params.email;
   let filtered_users = users.filter(user => user.email === email);
-  res.send(filtered_users);
+  res.send(JSON.stringify({filtered_users}, null, 4));
 });
 
 
@@ -80,5 +80,33 @@ router.delete("/:email", (req, res) => {
   users = users.filter(user => user.email !== email);
   res.send(`User with the email ${email} deleted`);
 });
+
+
+// GET request: Retrieve all users with the particular last name
+router.get("/lastName/:lastName", (req, res) => {
+    const lastName = req.params.lastName;
+
+    const filtered_users = users.filter(user => user.lastName === lastName);
+
+    res.send(filtered_users);
+});
+
+const getDateFromString = (dateStr) => {
+    let [dd, mm, yyyy] = dateStr.split('-');
+    return new Date(`${yyyy}/${mm}/${dd}`);
+};
+
+router.get("/sort/dob", (req, res) => {
+    const sort = (a, b) => a.DOB - b.DOB;
+
+    const modifiedDatesUsers = users.map(user => ({
+        ...user,
+        DOB: getDateFromString(user.DOB),
+    }));
+    const sorted_users = modifiedDatesUsers.sort(sort);
+
+    res.send(sorted_users);
+});
+
 
 module.exports=router;
